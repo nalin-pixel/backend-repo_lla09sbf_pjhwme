@@ -1,48 +1,100 @@
 """
-Database Schemas
+Database Schemas for Gandhi Engineering College (GEC)
 
-Define your MongoDB collection schemas here using Pydantic models.
-These schemas are used for data validation in your application.
-
-Each Pydantic model represents a collection in your database.
-Model name is converted to lowercase for the collection name:
-- User -> "user" collection
-- Product -> "product" collection
-- BlogPost -> "blogs" collection
+Each Pydantic model represents a MongoDB collection. The collection name is the
+lowercased class name.
 """
-
+from typing import List, Optional
 from pydantic import BaseModel, Field
-from typing import Optional
+from datetime import date
 
-# Example schemas (replace with your own):
+# Public content schemas
+class Course(BaseModel):
+    name: str = Field(..., description="Program name, e.g., B.Tech CSE")
+    level: str = Field(..., description="UG or PG")
+    branch: Optional[str] = Field(None, description="Discipline/Branch")
+    duration: str = Field(..., description="e.g., 4 Years")
+    intake: int = Field(..., ge=0, description="Sanctioned intake")
+    about: Optional[str] = None
+    eligibility: Optional[str] = None
+    outcomes: Optional[List[str]] = None
+    syllabus_pdf: Optional[str] = None
 
-class User(BaseModel):
-    """
-    Users collection schema
-    Collection name: "user" (lowercase of class name)
-    """
-    name: str = Field(..., description="Full name")
-    email: str = Field(..., description="Email address")
-    address: str = Field(..., description="Address")
-    age: Optional[int] = Field(None, ge=0, le=120, description="Age in years")
-    is_active: bool = Field(True, description="Whether user is active")
+class Faculty(BaseModel):
+    name: str
+    designation: str
+    department: str
+    specialization: Optional[str] = None
+    email: Optional[str] = None
+    photo_url: Optional[str] = None
+    bio: Optional[str] = None
 
-class Product(BaseModel):
-    """
-    Products collection schema
-    Collection name: "product" (lowercase of class name)
-    """
-    title: str = Field(..., description="Product title")
-    description: Optional[str] = Field(None, description="Product description")
-    price: float = Field(..., ge=0, description="Price in dollars")
-    category: str = Field(..., description="Product category")
-    in_stock: bool = Field(True, description="Whether product is in stock")
+class News(BaseModel):
+    title: str
+    date: str
+    category: str
+    content: Optional[str] = None
+    image_url: Optional[str] = None
+    cta_label: Optional[str] = None
+    cta_href: Optional[str] = None
+    pinned: bool = False
 
-# Add your own schemas here:
-# --------------------------------------------------
+# Student and academic schemas
+class Student(BaseModel):
+    roll: str
+    name: str
+    email: str
+    dob: date
+    department: str
+    program: str
+    semester: int
+    phone: Optional[str] = None
+    guardian_name: Optional[str] = None
+    guardian_phone: Optional[str] = None
+    address: Optional[str] = None
+    password_hash: Optional[str] = None
 
-# Note: The Flames database viewer will automatically:
-# 1. Read these schemas from GET /schema endpoint
-# 2. Use them for document validation when creating/editing
-# 3. Handle all database operations (CRUD) directly
-# 4. You don't need to create any database endpoints!
+class Attendance(BaseModel):
+    student_id: str
+    subject: str
+    percentage: float
+    month: str
+
+class Result(BaseModel):
+    student_id: str
+    semester: int
+    sgpa: float
+    cgpa: float
+    subjects: List[dict]
+
+class Fee(BaseModel):
+    student_id: str
+    semester: int
+    status: str
+    amount_due: float
+    last_payment_date: Optional[str] = None
+    receipt_url: Optional[str] = None
+
+class Assignment(BaseModel):
+    title: str
+    course: str
+    due_date: str
+    description: Optional[str] = None
+
+class Submission(BaseModel):
+    assignment_id: str
+    student_id: str
+    submitted_at: Optional[str] = None
+    file_url: Optional[str] = None
+
+class Timetable(BaseModel):
+    program: str
+    semester: int
+    week: List[dict]
+
+class Notice(BaseModel):
+    audience: str
+    title: str
+    body: Optional[str] = None
+    date: str
+    pinned: bool = False
